@@ -7,8 +7,12 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
  * Created by Magnus on 24/6/2015.
  */
 public class MasterPongWall {
-    private ModelInstance model;
-    private btCollisionObject collisionObject;
+    protected ModelInstance model;
+    protected btCollisionObject collisionObject;
+
+    public MasterPongWall(){
+        this(null, null);
+    }
 
     public MasterPongWall(ModelInstance model){
         this(model, null);
