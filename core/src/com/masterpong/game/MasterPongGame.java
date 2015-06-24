@@ -19,7 +19,7 @@ public class MasterPongGame extends ApplicationAdapter {
 	public ModelBatch modelBatch;
 	public PerspectiveCamera cam;
 	public Model model;
-	public List<ModelInstance> wallInstances = new ArrayList<ModelInstance>();
+	public List<MasterPongWall> wallInstances = new ArrayList<MasterPongWall>();
 	public Environment environment;
 	public CameraInputController camController;
 
@@ -54,10 +54,10 @@ public class MasterPongGame extends ApplicationAdapter {
 		model = mb.end();
 
 		ballInstance = new ModelInstance(model, "ball");
-		wallInstances.add(new ModelInstance(model, "roof"));
-		wallInstances.add(new ModelInstance(model, "floor"));
-		wallInstances.add(new ModelInstance(model, "right"));
-		wallInstances.add(new ModelInstance(model, "left"));
+		wallInstances.add(new MasterPongWall(new ModelInstance(model, "roof")));
+		wallInstances.add(new MasterPongWall(new ModelInstance(model, "floor")));
+		wallInstances.add(new MasterPongWall(new ModelInstance(model, "right")));
+		wallInstances.add(new MasterPongWall(new ModelInstance(model, "left")));
 
 		camController = new CameraInputController(cam);
 		Gdx.input.setInputProcessor(camController);
@@ -114,8 +114,8 @@ public class MasterPongGame extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
 		modelBatch.begin(cam);
-		for (ModelInstance instance : wallInstances) {
-			modelBatch.render(instance, environment);
+		for (MasterPongWall wall : wallInstances) {
+			modelBatch.render(wall.getModel(), environment);
 		}
 		modelBatch.end();
 
