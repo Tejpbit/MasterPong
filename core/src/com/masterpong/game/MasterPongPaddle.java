@@ -1,11 +1,16 @@
 package com.masterpong.game;
 
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.math.Vector3;
 
 /**
  * Created by Magnus on 24/6/2015.
  */
 public class MasterPongPaddle extends MasterPongWall{
+
+    public MasterPongPaddle(ModelInstance model){
+        super(model);
+    }
 
     private void setX(float x){
         Vector3 location = model.transform.getTranslation(new Vector3());

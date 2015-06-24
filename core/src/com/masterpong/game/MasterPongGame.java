@@ -20,6 +20,7 @@ public class MasterPongGame extends ApplicationAdapter {
 	public PerspectiveCamera cam;
 	public Model model;
 	public List<MasterPongWall> wallInstances = new ArrayList<MasterPongWall>();
+	public List<MasterPongPaddle> paddleInstances = new ArrayList<MasterPongPaddle>();
 	public Environment environment;
 	public CameraInputController camController;
 
@@ -45,6 +46,7 @@ public class MasterPongGame extends ApplicationAdapter {
 		ModelBuilder mb = new ModelBuilder();
 		mb.begin();
 		addPlanes(0, 0, 0, 20, 10, 10, mb);
+		addPaddles(2, 2, 0, 0, 0, 20, 10, 10, mb);
 
 		mb.node().id = "ball";
 		mb.part("sphere", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
@@ -58,6 +60,8 @@ public class MasterPongGame extends ApplicationAdapter {
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "floor")));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "right")));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "left")));
+		paddleInstances.add(new MasterPongPaddle(new ModelInstance(model, "paddle1")));
+		paddleInstances.add(new MasterPongPaddle(new ModelInstance(model, "paddle2")));
 
 		camController = new CameraInputController(cam);
 		Gdx.input.setInputProcessor(camController);
@@ -104,6 +108,25 @@ public class MasterPongGame extends ApplicationAdapter {
 						5, 5, 5);
 	}
 
+	private void addPaddles(float width, float height, float x0, float y0, float z0, float x1, float y1, float z1, ModelBuilder modelBuilder){
+		addPlane("paddle1",
+				x0, (y0 + y1 - width) / 2, (z0 + z1 - height) / 2,
+				x0, (y0 + y1 + width) / 2, (z0 + z1 - height) / 2,
+				x0, (y0 + y1 + width) / 2, (z0 + z1 + height) / 2,
+				x0, (z0 + z1 - width) / 2, (z0 + z1 + height) / 2,
+				modelBuilder);
+		addPlane("paddle2",
+				x1, (z0 + z1 - width) / 2, (z0 + z1 + height) / 2,
+				x1, (y0 + y1 + width) / 2, (z0 + z1 + height) / 2,
+				x1, (y0 + y1 + width) / 2, (z0 + z1 - height) / 2,
+				x1, (y0 + y1 - width) / 2, (z0 + z1 - height) / 2,
+				modelBuilder);
+	}
+
+	private void addPaddle(String id, float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, ModelBuilder modelBuilder) {
+		return;
+	}
+
 	@Override
 	public void render() {
 		camController.update();
@@ -116,6 +139,9 @@ public class MasterPongGame extends ApplicationAdapter {
 		modelBatch.begin(cam);
 		for (MasterPongWall wall : wallInstances) {
 			modelBatch.render(wall.getModel(), environment);
+		}
+		for (MasterPongPaddle paddle : paddleInstances){
+			modelBatch.render(paddle.getModel(), environment);
 		}
 		modelBatch.end();
 
