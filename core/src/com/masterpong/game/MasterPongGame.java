@@ -2,14 +2,17 @@ package com.masterpong.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +22,15 @@ public class MasterPongGame extends ApplicationAdapter {
 	public ModelBatch modelBatch;
 	public PerspectiveCamera cam;
 	public Model model;
-	public List<MasterPongWall> wallInstances = new ArrayList<MasterPongWall>();
 	public Environment environment;
 	public CameraInputController camController;
 
-	public ModelInstance ballInstance;
-	public Vector3 ballVelocity = new Vector3(1, 1, 1);
+	public List<MasterPongWall> wallInstances = new ArrayList<>();
+
+	public MasterPongBall ball;
+
+	btCollisionConfiguration collisionConfig;;
+	btDispatcher dispatcher;
 
 	@Override
 	public void create () {
@@ -49,15 +55,19 @@ public class MasterPongGame extends ApplicationAdapter {
 		mb.node().id = "ball";
 		mb.part("sphere", GL20.GL_TRIANGLES, VertexAttributes.Usage.Position | VertexAttributes.Usage.Normal,
 				new Material(ColorAttribute.createDiffuse(Color.GREEN)))
-				.sphere(1f, 1f, 1f, 10, 10);
+				.sphere(1f, 1f, 1f, 20, 20);
 
 		model = mb.end();
 
-		ballInstance = new ModelInstance(model, "ball");
+		ball = new MasterPongBall(new ModelInstance(model, "ball"));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "roof")));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "floor")));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "right")));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "left")));
+
+
+		collisionConfig = new btDefaultCollisionConfiguration();
+		dispatcher = new btCollisionDispatcher(collisionConfig);
 
 		camController = new CameraInputController(cam);
 		Gdx.input.setInputProcessor(camController);
@@ -104,12 +114,21 @@ public class MasterPongGame extends ApplicationAdapter {
 						5, 5, 5);
 	}
 
+	boolean collision;
+
 	@Override
 	public void render() {
+		final float delta = Math.min(1f/30f, Gdx.graphics.getDeltaTime());
+
+		if (!collision) {
+			ball.getModelInstance().transform.translate(0f, -delta, 0f);
+			ball.getCollisionObject().setWorldTransform(ball.getModelInstance().transform);
+
+			collision = checkCollision();
+		}
+
 		camController.update();
-		ballInstance.transform.translate(0.1f, 0.1f, 0.1f);
-		collisionHandling();
-		
+
 		Gdx.gl.glViewport(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -119,22 +138,24 @@ public class MasterPongGame extends ApplicationAdapter {
 		}
 		modelBatch.end();
 
-		modelBatch.render(ballInstance, environment);
-		//ballInstance.§
+		modelBatch.render(ball.getModelInstance(), environment);
 	}
 
-	private void collisionHandling() {
-		Vector3 vector = new Vector3();
-		ballInstance.transform.getTranslation(vector);
-		System.out.println(vector.toString());
-
-//		for (ModelInstance instance : wallInstances) {
-//			instance.transform.
-//		}
+	private boolean checkCollision() {
+		return false;
 	}
 
 	@Override
 	public void dispose() {
+		dispatcher.dispose();
+		collisionConfig.dispose();
+
+		ball.dispose();
+
+		for (MasterPongWall wall : wallInstances) {
+			wall.dispose();
+		}
+//		TODO dispose of all shapes and objects used for collision detection, the ones created in master pong ball and wall
 		modelBatch.dispose();
 		model.dispose();
 	}
