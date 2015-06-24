@@ -18,7 +18,7 @@ public class MasterPongGame extends ApplicationAdapter {
 	public ModelBatch modelBatch;
 	public PerspectiveCamera cam;
 	public Model model;
-	public List<ModelInstance> instances = new ArrayList<>();
+	public List<ModelInstance> instances = new ArrayList<ModelInstance>();
 	public Environment environment;
 	public CameraInputController camController;
 
@@ -38,33 +38,35 @@ public class MasterPongGame extends ApplicationAdapter {
 		environment.add(new DirectionalLight().set(0.8f, 0.8f, 0.8f, -1f, -0.8f, -0.2f));
 
 		ModelBuilder modelBuilder = new ModelBuilder();
-
-		addPlane(0, 0, 0,
-				20, 0, 0,
-				20, 10, 0,
-				0, 10, 0, modelBuilder);
-		addPlane(
-				0, 0, 0,
-				0, 0, 10,
-				20, 0, 10,
-				20, 0, 0,
-				modelBuilder);
-		addPlane(
-				0, 10, 10,
-				20, 10, 10,
-				20, 0, 10,
-				0, 0, 10,
-				modelBuilder);
-		addPlane(
-				0, 10, 0,
-				20, 10, 0,
-				20, 10, 10,
-				0, 10, 10,
-				modelBuilder);
-
+		addPlanes(0, 0, 0, 20, 10, 10, modelBuilder);
 
 		camController = new CameraInputController(cam);
 		Gdx.input.setInputProcessor(camController);
+	}
+
+	private void addPlanes(float x0, float y0, float z0, float x1, float y1, float z1, ModelBuilder modelBuilder){
+		addPlane(x0, y0, z0,
+				x1, y0, z0,
+				x1, y1, z0,
+				x0, y1, z0, modelBuilder);
+		addPlane(
+				x0, y0, z0,
+				x0, y0, z1,
+				x1, y0, z1,
+				x1, y0, z0,
+				modelBuilder);
+		addPlane(
+				x0, y1, z1,
+				x1, y1, z1,
+				x1, y0, z1,
+				x0, y0, z1,
+				modelBuilder);
+		addPlane(
+				x0, y1, z0,
+				x1, y1, z0,
+				x1, y1, z1,
+				x0, y1, z1,
+				modelBuilder);
 	}
 
 	private void addPlane(float x00, float y00, float z00, float x10, float y10, float z10, float x11, float y11, float z11, float x01, float y01, float z01, ModelBuilder modelBuilder) {
