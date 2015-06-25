@@ -36,8 +36,13 @@ public class MasterPongBall {
         return collisionObject;
     }
 
+    public void move(float x, float y, float z) {
+        modelInstance.transform.translate(x,y,z);
+    }
+
     public void dispose() {
         collisionShape.dispose();
         collisionObject.dispose();
     }
+
 }
