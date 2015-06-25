@@ -70,6 +70,7 @@ public class MasterPongGame extends ApplicationAdapter {
 		paddleInstances.add(new MasterPongPaddle(new ModelInstance(model, "paddle1")));
 		paddleInstances.add(new MasterPongPaddle(new ModelInstance(model, "paddle2")));
 
+		ball.move(0, 5, 0);
 
 		collisionConfig = new btDefaultCollisionConfiguration();
 		dispatcher = new btCollisionDispatcher(collisionConfig);
@@ -165,7 +166,28 @@ public class MasterPongGame extends ApplicationAdapter {
 	}
 
 	private boolean checkCollision() {
-		return false;
+		CollisionObjectWrapper co0 = new CollisionObjectWrapper(ball.collisionObject);
+		CollisionObjectWrapper co1 = new CollisionObjectWrapper(wallInstances.get(1).collisionObject);
+
+		btCollisionAlgorithmConstructionInfo ci = new btCollisionAlgorithmConstructionInfo();
+		ci.setDispatcher1(dispatcher);
+		btCollisionAlgorithm algorithm = new btSphereBoxCollisionAlgorithm(null, ci, co0.wrapper, co1.wrapper, false);
+
+		btDispatcherInfo info = new btDispatcherInfo();
+		btManifoldResult result = new btManifoldResult(co0.wrapper, co1.wrapper);
+
+		algorithm.processCollision(co0.wrapper, co1.wrapper, info, result);
+
+		boolean r = result.getPersistentManifold().getNumContacts() > 0;
+
+		result.dispose();
+		info.dispose();
+		algorithm.dispose();
+		ci.dispose();
+		co1.dispose();
+		co0.dispose();
+
+		return r;
 	}
 
 	@Override
@@ -178,7 +200,6 @@ public class MasterPongGame extends ApplicationAdapter {
 		for (MasterPongWall wall : wallInstances) {
 			wall.dispose();
 		}
-//		TODO dispose of all shapes and objects used for collision detection, the ones created in master pong ball and wall
 		modelBatch.dispose();
 		model.dispose();
 	}
