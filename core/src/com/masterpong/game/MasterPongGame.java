@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.*;
 
@@ -62,7 +63,7 @@ public class MasterPongGame extends ApplicationAdapter {
 
 		model = mb.end();
 
-		ball = new MasterPongBall(new ModelInstance(model, "ball"));
+		ball = new MasterPongBall(new ModelInstance(model, "ball"), new Vector3(0f, -0.01f, 0.01f));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "roof")));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "floor")));
 		wallInstances.add(new MasterPongWall(new ModelInstance(model, "right")));
@@ -142,8 +143,9 @@ public class MasterPongGame extends ApplicationAdapter {
 		final float delta = Math.min(1f/30f, Gdx.graphics.getDeltaTime());
 
 		if (!collision) {
-			ball.getModelInstance().transform.translate(0f, -delta, 0f);
-			ball.getCollisionObject().setWorldTransform(ball.getModelInstance().transform);
+			ball.move(1);
+//			ball.getModelInstance().transform.translate(0f, -delta, 0f);
+//			ball.getCollisionObject().setWorldTransform(ball.getModelInstance().transform);
 
 			collision = checkCollision();
 		}
@@ -177,7 +179,7 @@ public class MasterPongGame extends ApplicationAdapter {
 		btManifoldResult result = new btManifoldResult(co0.wrapper, co1.wrapper);
 
 		algorithm.processCollision(co0.wrapper, co1.wrapper, info, result);
-
+		
 		boolean r = result.getPersistentManifold().getNumContacts() > 0;
 
 		result.dispose();
